@@ -8,7 +8,7 @@ use std::fmt;
 use std::process::Command as ProcessCommand;
 
 use oxda_sha_core::{Digest, DigestParseError, Fingerprint, FingerprintVersion};
-use oxda_sha_svg::{render, SvgRendererVersion};
+use oxda_sha_svg::{SvgRendererVersion, render};
 
 const MAX_REVISION_BYTES: usize = 256;
 
@@ -30,9 +30,15 @@ pub enum ExitCode {
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub enum CliCommand {
     /// Resolve an object expression to its canonical full digest.
-    Resolve { input: String },
+    Resolve {
+        /// Full digest or repository-relative Git expression.
+        input: String,
+    },
     /// Render an object expression as deterministic SVG v1.
-    Svg { input: String },
+    Svg {
+        /// Full digest or repository-relative Git expression.
+        input: String,
+    },
 }
 
 /// Git revision-resolution boundary.
@@ -107,7 +113,9 @@ impl fmt::Display for GitResolveError {
             Self::InvalidRevision => formatter.write_str("invalid Git revision"),
             Self::Spawn { message } => write!(formatter, "failed to start Git: {message}"),
             Self::Rejected { status, stderr } => match (status, stderr.is_empty()) {
-                (Some(code), false) => write!(formatter, "Git resolution failed ({code}): {stderr}"),
+                (Some(code), false) => {
+                    write!(formatter, "Git resolution failed ({code}): {stderr}")
+                }
                 (Some(code), true) => write!(formatter, "Git resolution failed ({code})"),
                 (None, false) => write!(formatter, "Git resolution failed: {stderr}"),
                 (None, true) => formatter.write_str("Git resolution failed"),
