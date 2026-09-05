@@ -37,11 +37,15 @@ pub struct Digest {
 impl Digest {
     /// Returns the digest algorithm.
     #[must_use]
-    pub const fn algorithm(&self) -> DigestAlgorithm { self.algorithm }
+    pub const fn algorithm(&self) -> DigestAlgorithm {
+        self.algorithm
+    }
 
     /// Returns the canonical digest bytes.
     #[must_use]
-    pub fn as_bytes(&self) -> &[u8] { &self.bytes[..self.algorithm.byte_len()] }
+    pub fn as_bytes(&self) -> &[u8] {
+        &self.bytes[..self.algorithm.byte_len()]
+    }
 }
 
 impl FromStr for Digest {
@@ -55,8 +59,11 @@ impl FromStr for Digest {
         };
         let mut bytes = [0_u8; 32];
         for (index, pair) in value.as_bytes().chunks_exact(2).enumerate() {
-            let high = decode_hex(pair[0]).ok_or(DigestParseError::InvalidHex { index: index * 2 })?;
-            let low = decode_hex(pair[1]).ok_or(DigestParseError::InvalidHex { index: index * 2 + 1 })?;
+            let high =
+                decode_hex(pair[0]).ok_or(DigestParseError::InvalidHex { index: index * 2 })?;
+            let low = decode_hex(pair[1]).ok_or(DigestParseError::InvalidHex {
+                index: index * 2 + 1,
+            })?;
             bytes[index] = (high << 4) | low;
         }
         Ok(Self { algorithm, bytes })
@@ -65,7 +72,9 @@ impl FromStr for Digest {
 
 impl fmt::Display for Digest {
     fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
-        for byte in self.as_bytes() { write!(formatter, "{byte:02x}")?; }
+        for byte in self.as_bytes() {
+            write!(formatter, "{byte:02x}")?;
+        }
         Ok(())
     }
 }
@@ -74,18 +83,24 @@ impl fmt::Display for Digest {
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum DigestParseError {
     /// Input length is neither 40 nor 64 hexadecimal characters.
-    InvalidLength { /// Actual input length in bytes.
-        actual: usize },
+    InvalidLength {
+        /// Actual input length in bytes.
+        actual: usize,
+    },
     /// Input contains a non-hexadecimal byte.
-    InvalidHex { /// Zero-based byte position of the invalid character.
-        index: usize },
+    InvalidHex {
+        /// Zero-based byte position of the invalid character.
+        index: usize,
+    },
 }
 
 impl fmt::Display for DigestParseError {
     fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Self::InvalidLength { actual } => write!(formatter, "invalid digest length: {actual}"),
-            Self::InvalidHex { index } => write!(formatter, "invalid hexadecimal character at {index}"),
+            Self::InvalidHex { index } => {
+                write!(formatter, "invalid hexadecimal character at {index}")
+            }
         }
     }
 }
@@ -93,22 +108,30 @@ impl std::error::Error for DigestParseError {}
 
 /// Released fingerprint algorithm versions.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
-pub enum FingerprintVersion { /// First canonical fingerprint mapping.
-    V1 }
+pub enum FingerprintVersion {
+    /// First canonical fingerprint mapping.
+    V1,
+}
 
 /// Renderer-neutral 8×8 fingerprint model.
 #[derive(Clone, Debug, Eq, PartialEq)]
-pub struct Fingerprint { cells: [u8; 64] }
+pub struct Fingerprint {
+    cells: [u8; 64],
+}
 
 impl Fingerprint {
     /// Derives a canonical fingerprint.
     #[must_use]
     pub fn derive(digest: &Digest, version: FingerprintVersion) -> Self {
-        match version { FingerprintVersion::V1 => derive_v1(digest) }
+        match version {
+            FingerprintVersion::V1 => derive_v1(digest),
+        }
     }
     /// Returns row-major palette indices for the canonical grid.
     #[must_use]
-    pub const fn cells(&self) -> &[u8; 64] { &self.cells }
+    pub const fn cells(&self) -> &[u8; 64] {
+        &self.cells
+    }
 }
 
 fn derive_v1(digest: &Digest) -> Fingerprint {
@@ -140,24 +163,39 @@ mod tests {
     fn parses_and_normalizes_sha1() {
         let digest: Digest = "0123456789ABCDEF0123456789ABCDEF01234567".parse().unwrap();
         assert_eq!(digest.algorithm(), DigestAlgorithm::Sha1);
-        assert_eq!(digest.to_string(), "0123456789abcdef0123456789abcdef01234567");
+        assert_eq!(
+            digest.to_string(),
+            "0123456789abcdef0123456789abcdef01234567"
+        );
     }
 
     #[test]
     fn parses_sha256() {
-        let digest: Digest = "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f".parse().unwrap();
+        let digest: Digest = "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f"
+            .parse()
+            .unwrap();
         assert_eq!(digest.algorithm(), DigestAlgorithm::Sha256);
     }
 
     #[test]
     fn rejects_short_git_identifiers() {
-        assert_eq!("31ca016".parse::<Digest>().unwrap_err(), DigestParseError::InvalidLength { actual: 7 });
+        assert_eq!(
+            "31ca016".parse::<Digest>().unwrap_err(),
+            DigestParseError::InvalidLength { actual: 7 }
+        );
     }
 
     #[test]
     fn v1_matches_golden_vector() {
         let digest: Digest = "0123456789abcdef0123456789abcdef01234567".parse().unwrap();
         let fingerprint = Fingerprint::derive(&digest, FingerprintVersion::V1);
-        assert_eq!(fingerprint.cells(), &[0,0,0,1,0,2,0,3,1,0,1,1,1,2,1,3,2,0,2,1,2,2,2,3,3,0,3,1,3,2,3,3,0,0,0,1,0,2,0,3,1,0,1,1,1,2,1,3,2,0,2,1,2,2,2,3,3,0,3,1,3,2,3,3]);
+        assert_eq!(
+            fingerprint.cells(),
+            &[
+                0, 0, 0, 1, 0, 2, 0, 3, 1, 0, 1, 1, 1, 2, 1, 3, 2, 0, 2, 1, 2, 2, 2, 3, 3, 0, 3, 1,
+                3, 2, 3, 3, 0, 0, 0, 1, 0, 2, 0, 3, 1, 0, 1, 1, 1, 2, 1, 3, 2, 0, 2, 1, 2, 2, 2, 3,
+                3, 0, 3, 1, 3, 2, 3, 3
+            ]
+        );
     }
 }
