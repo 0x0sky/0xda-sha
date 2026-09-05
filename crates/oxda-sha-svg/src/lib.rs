@@ -56,8 +56,7 @@ mod tests {
 
     use super::*;
 
-    const GOLDEN_SVG: &str =
-        include_str!("../../../fixtures/svg-v1/sha1-0123456789abcdef.svg");
+    const GOLDEN_SVG: &str = include_str!("../../../fixtures/svg-v1/sha1-0123456789abcdef.svg");
 
     fn fixture() -> Fingerprint {
         let digest: Digest = "0123456789abcdef0123456789abcdef01234567"
