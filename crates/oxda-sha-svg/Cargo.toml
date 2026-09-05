@@ -1,0 +1,15 @@
+# © 2026 aiaiaiai · aiaiaiai.org
+
+[package]
+name = "oxda-sha-svg"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+publish = false
+
+[dependencies]
+oxda-sha-core = { path = "../oxda-sha-core" }
+
+[lints]
+workspace = true
