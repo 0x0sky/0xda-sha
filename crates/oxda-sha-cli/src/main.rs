@@ -7,7 +7,7 @@
 use std::env;
 use std::process::ExitCode as ProcessExitCode;
 
-use oxda_sha_cli::{execute, parse, ExitCode, SystemGitResolver};
+use oxda_sha_cli::{ExitCode, SystemGitResolver, execute, parse};
 
 fn main() -> ProcessExitCode {
     let args = env::args().skip(1).collect::<Vec<_>>();
