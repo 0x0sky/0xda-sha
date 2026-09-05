@@ -1,0 +1,6 @@
+# © 2026 aiaiaiai · aiaiaiai.org
+
+edition = "2024"
+style_edition = "2024"
+use_field_init_shorthand = true
+use_try_shorthand = true

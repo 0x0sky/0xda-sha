@@ -1,0 +1,20 @@
+# © 2026 aiaiaiai · aiaiaiai.org
+
+[package]
+name = "oxda-sha-cli"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+publish = false
+
+[[bin]]
+name = "0xda-sha"
+path = "src/main.rs"
+
+[dependencies]
+oxda-sha-core = { path = "../oxda-sha-core" }
+oxda-sha-svg = { path = "../oxda-sha-svg" }
+
+[lints]
+workspace = true
