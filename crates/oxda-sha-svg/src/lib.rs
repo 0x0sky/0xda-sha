@@ -56,11 +56,19 @@ mod tests {
 
     use super::*;
 
+    const GOLDEN_SVG: &str =
+        include_str!("../../../fixtures/svg-v1/sha1-0123456789abcdef.svg");
+
     fn fixture() -> Fingerprint {
         let digest: Digest = "0123456789abcdef0123456789abcdef01234567"
             .parse()
             .expect("fixture digest must be valid");
         Fingerprint::derive(&digest, FingerprintVersion::V1)
+    }
+
+    #[test]
+    fn v1_matches_golden_bytes() {
+        assert_eq!(render(&fixture(), SvgRendererVersion::V1), GOLDEN_SVG);
     }
 
     #[test]
