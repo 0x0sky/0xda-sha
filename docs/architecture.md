@@ -34,12 +34,16 @@ Owns deterministic projection from the canonical model into SVG bytes. It may de
 
 Owns argument parsing, Git revision resolution through an explicit process adapter, renderer selection, output, diagnostics, and exit-code mapping.
 
+Repository-relative state crosses into the application only through a `GitResolver` port. Complete canonical digests bypass Git entirely; repository-relative expressions are resolved to a validated full digest before crossing into `oxda-sha-core`.
+
 ## Determinism contract
 
 For a released fingerprint algorithm version, the same canonical full digest must produce the same canonical fingerprint independently of machine, time, locale, repository, renderer, or invocation path.
 
 Renderer byte stability is a separate versioned concern. A visual renderer may evolve without silently changing the canonical fingerprint algorithm.
 
-## Bootstrap boundary
+## Versioned boundaries
 
-This repository foundation deliberately contains no fingerprint algorithm. The first semantic implementation must arrive in a separate PR with an explicit `v1` specification and golden vectors. That separation prevents repository/tooling choices from accidentally becoming protocol semantics.
+Fingerprint algorithm `v1` and SVG renderer `v1` are released as independent deterministic contracts. The CLI composes those contracts but does not own or reinterpret them.
+
+Adding a new renderer, application adapter, or repository integration must therefore preserve the existing core fingerprint contract unless a new fingerprint algorithm version is introduced explicitly. Likewise, changing fingerprint semantics must not silently reuse an existing released version.
